@@ -45,7 +45,7 @@ include_directories(src)
 
 file(GLOB_RECURSE SOURCES src/*.c)
 
-if(WIN32)
+if(WIN32 AND NOT MINGW)
     set_source_files_properties(src/io/sink_wavwrite.c PROPERTIES COMPILE_FLAGS /FIWinsock2.h)
 endif()
 
