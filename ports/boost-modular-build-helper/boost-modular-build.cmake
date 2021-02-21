@@ -17,6 +17,8 @@ function(boost_modular_build)
     endif()
 
     # Todo: this serves too similar a purpose as vcpkg_find_acquire_program()
+    
+    message(STATUS "CMAKE_HOST_SYSTEM_NAME: ${CMAKE_HOST_SYSTEM_NAME}")
     if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux")
         if(CMAKE_HOST_SYSTEM_PROCESSOR STREQUAL "aarch64")
             set(BOOST_BUILD_PATH "${CURRENT_INSTALLED_DIR}/../arm64-linux/tools/boost-build")
@@ -32,7 +34,7 @@ function(boost_modular_build)
     else()
         set(BOOST_BUILD_PATH "${CURRENT_INSTALLED_DIR}/tools/boost-build")
     endif()
-
+    message(STATUS "boost build path is: ${BOOST_BUILD_PATH}")
     if(NOT EXISTS "${BOOST_BUILD_PATH}")
         if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux" AND VCPKG_TARGET_ARCHITECTURE STREQUAL "arm64")
             if(CMAKE_HOST_SYSTEM_PROCESSOR STREQUAL "aarch64")
