@@ -174,7 +174,7 @@ add_custom_target(boost ALL
         -sBOOST_ROOT=${BOOST_BUILD_PATH}
         -sBOOST_BUILD_PATH=${BOOST_BUILD_PATH}
         --debug-configuration
-        --ignore-site-config
+        #--ignore-site-config
         --hash
         -q
 
