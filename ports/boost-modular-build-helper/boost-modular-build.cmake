@@ -123,6 +123,14 @@ function(boost_modular_build)
         if(DEFINED _bm_BOOST_CMAKE_FRAGMENT)
             list(APPEND configure_option "-DBOOST_CMAKE_FRAGMENT=${_bm_BOOST_CMAKE_FRAGMENT}")
         endif()
+        
+        message(STATUS "VCPKG_CMAKE_SYSTEM_NAME: ${VCPKG_CMAKE_SYSTEM_NAME}")
+        if(VCPKG_CMAKE_SYSTEM_NAME STREQUAL MinGW)
+            message(STATUS "APPEND configure_option")
+            list(APPEND configure_option abi=ms binary-format=pe target-os=windows)
+            message(STATUS "Now: ${configure_option}")
+        endif()
+
         vcpkg_configure_cmake(
             SOURCE_PATH ${CURRENT_INSTALLED_DIR}/share/boost-build
             PREFER_NINJA
