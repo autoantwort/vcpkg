@@ -140,7 +140,7 @@ function(boost_modular_build)
                 "-DCURRENT_INSTALLED_DIR=${CURRENT_INSTALLED_DIR}"
                 "-DB2_EXE=${B2_EXE}"
                 "-DSOURCE_PATH=${_bm_SOURCE_PATH}"
-                "-DBOOST_BUILD_PATH=${BOOST_BUILD_PATH}"
+                "-DBOOST_BUILD_PATH=${BOOST_BUILD_PATH} "
                 ${configure_option}
         )
         vcpkg_install_cmake()
