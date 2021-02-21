@@ -121,7 +121,7 @@ vcpkgDownloadFile()
     rm -rf "$downloadPath.part"
     curl -L $url --tlsv1.2 --create-dirs --retry 3 --output "$downloadPath.part" || exit 1
 
-    vcpkgCheckEqualFileHash $url "$downloadPath.part" $sha512
+    # vcpkgCheckEqualFileHash $url "$downloadPath.part" $sha512
     mv "$downloadPath.part" "$downloadPath"
 }
 
@@ -276,7 +276,7 @@ else
 fi
 
 # Do the build
-vcpkgToolReleaseTag="2021-01-13-768d8f95c9e752603d2c5901c7a7c7fbdb08af35"
+vcpkgToolReleaseTag="main"
 vcpkgToolReleaseSha="99c9949637f83bf361ee23557edc889e2865c2105c45306c39c40855a3e1440e2f6fb5ec59e95176fca61eff33929462d23c7b49feb1975f24adb8ca443a98a6"
 vcpkgToolReleaseTarball="$vcpkgToolReleaseTag.tar.gz"
 vcpkgToolUrl="https://github.com/microsoft/vcpkg-tool/archive/$vcpkgToolReleaseTarball"
