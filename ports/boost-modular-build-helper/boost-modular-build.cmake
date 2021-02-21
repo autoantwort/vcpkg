@@ -127,7 +127,7 @@ function(boost_modular_build)
         message(STATUS "VCPKG_CMAKE_SYSTEM_NAME: ${VCPKG_CMAKE_SYSTEM_NAME}")
         if(VCPKG_CMAKE_SYSTEM_NAME STREQUAL MinGW)
             message(STATUS "APPEND configure_option")
-            list(APPEND configure_option abi=ms binary-format=pe target-os=windows)
+            list(APPEND configure_option "abi=ms" "binary-format=pe" "target-os=windows")
             message(STATUS "Now: ${configure_option}")
         endif()
 
