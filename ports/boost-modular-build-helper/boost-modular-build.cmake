@@ -312,7 +312,9 @@ function(boost_modular_build)
     endif()
 
     if(VCPKG_CMAKE_SYSTEM_NAME STREQUAL MinGW)
+        message(STATUS "APPEND options")
         list(APPEND B2_OPTIONS abi=ms binary-format=pe target-os=windows)
+        message(STATUS "Now: ${B2_OPTIONS}")
     endif()
 
     file(TO_CMAKE_PATH "${_bm_DIR}/nothing.bat" NOTHING_BAT)
