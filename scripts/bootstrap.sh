@@ -277,7 +277,7 @@ fi
 
 # Do the build
 vcpkgToolReleaseTag="main"
-vcpkgToolReleaseSha="99c9949637f83bf361ee23557edc889e2865c2105c45306c39c40855a3e1440e2f6fb5ec59e95176fca61eff33929462d23c7b49feb1975f24adb8ca443a98a6"
+vcpkgToolReleaseSha="7dfec58480ed584b700ebcb66bdc9e57dc0f7367d452e620843c2d4bd28d83c0ee3d151bca12f367dc61d475dfba6597a7b53dcc28a1ede85eaadf39451508d0"
 vcpkgToolReleaseTarball="$vcpkgToolReleaseTag.tar.gz"
 vcpkgToolUrl="https://github.com/microsoft/vcpkg-tool/archive/$vcpkgToolReleaseTarball"
 baseBuildDir="$vcpkgRootDir/buildtrees/_vcpkg"
