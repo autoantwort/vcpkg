@@ -311,6 +311,10 @@ function(boost_modular_build)
         list(APPEND B2_OPTIONS address-model=32 architecture=x86)
     endif()
 
+    if(VCPKG_CMAKE_SYSTEM_NAME STREQUAL MinGW)
+        list(APPEND B2_OPTIONS abi=ms binary-format=pe target-os=windows)
+    endif()
+
     file(TO_CMAKE_PATH "${_bm_DIR}/nothing.bat" NOTHING_BAT)
     set(TOOLSET_OPTIONS "<cxxflags>/EHsc <compileflags>-Zm800 <compileflags>-nologo")
     if(VCPKG_CMAKE_SYSTEM_NAME STREQUAL "WindowsStore")
