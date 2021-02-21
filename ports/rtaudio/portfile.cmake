@@ -8,9 +8,16 @@ vcpkg_from_github(
     HEAD_REF master
 )
 
+if(VCPKG_CRT_LINKAGE STREQUAL static)
+    set(RTAUDIO_STATIC_MSVCRT ON)
+else()
+    set(RTAUDIO_STATIC_MSVCRT OFF)
+endif()
+
 vcpkg_configure_cmake(
     SOURCE_PATH ${SOURCE_PATH}
     PREFER_NINJA
+    OPTIONS -DRTAUDIO_STATIC_MSVCRT=${RTAUDIO_STATIC_MSVCRT}
 )
 
 vcpkg_install_cmake()
