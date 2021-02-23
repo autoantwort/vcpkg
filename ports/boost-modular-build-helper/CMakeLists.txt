@@ -48,7 +48,7 @@ endif()
 if(APPLE)
     list(APPEND B2_OPTIONS target-os=darwin toolset=clang)
 elseif(WIN32)
-    list(APPEND B2_OPTIONS target-os=windows toolset=gcc binary-format=pe)
+    list(APPEND B2_OPTIONS target-os=windows toolset=gcc)
 else()
     list(APPEND B2_OPTIONS target-os=linux toolset=gcc)
 endif()
@@ -174,7 +174,7 @@ add_custom_target(boost ALL
         -sBOOST_ROOT=${BOOST_BUILD_PATH}
         -sBOOST_BUILD_PATH=${BOOST_BUILD_PATH}
         --debug-configuration
-        #--ignore-site-config
+        --ignore-site-config
         --hash
         -q
 
