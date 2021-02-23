@@ -5,12 +5,12 @@ endif()
 if(VCPKG_TARGET_IS_WINDOWS)
     message(STATUS "test2")
 endif()
-if(VCPKG_TARGET_IS_WINDOWS)
+# if(VCPKG_TARGET_IS_WINDOWS)
     message(STATUS "test3")
     list(APPEND B2_OPTIONS
         abi=ms
         binary-format=pe
     )
-endif()
+# endif()
 message(STATUS "B2_OPTIONS: ${B2_OPTIONS}")
 
