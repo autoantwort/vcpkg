@@ -17,12 +17,39 @@ function(boost_modular_build)
     endif()
 
     # Todo: this serves too similar a purpose as vcpkg_find_acquire_program()
-    
-    message(STATUS "CMAKE_HOST_SYSTEM_NAME: ${CMAKE_HOST_SYSTEM_NAME}")
-    set(BOOST_BUILD_PATH "${CURRENT_HOST_INSTALLED_DIR}/tools/boost-build")
-        
-    message(STATUS "boost build path is: ${BOOST_BUILD_PATH}")
-    
+    if(CURRENT_HOST_INSTALLED_DIR)
+        set(BOOST_BUILD_PATH "${CURRENT_HOST_INSTALLED_DIR}/tools/boost-build")
+    elseif(VCPKG_CMAKE_SYSTEM_NAME STREQUAL "Linux" AND VCPKG_TARGET_ARCHITECTURE STREQUAL "arm64")
+        if(CMAKE_HOST_SYSTEM_PROCESSOR STREQUAL "aarch64")
+            set(BOOST_BUILD_PATH "${CURRENT_INSTALLED_DIR}/../arm64-linux/tools/boost-build")
+        else()
+            set(BOOST_BUILD_PATH "${CURRENT_INSTALLED_DIR}/../x64-linux/tools/boost-build")
+        endif()
+    elseif(VCPKG_CMAKE_SYSTEM_NAME STREQUAL "Linux" AND CMAKE_HOST_SYSTEM_PROCESSOR STREQUAL "armv7l")
+        set(BOOST_BUILD_PATH "${CURRENT_INSTALLED_DIR}/../arm-linux/tools/boost-build")
+    elseif(CMAKE_HOST_WIN32 AND VCPKG_CMAKE_SYSTEM_NAME AND NOT VCPKG_CMAKE_SYSTEM_NAME STREQUAL "WindowsStore" AND NOT VCPKG_CMAKE_SYSTEM_NAME STREQUAL "MinGW")
+        get_filename_component(BOOST_BUILD_PATH "${CURRENT_INSTALLED_DIR}/../x86-windows/tools/boost-build" ABSOLUTE)
+    elseif(NOT VCPKG_TARGET_ARCHITECTURE STREQUAL "x64" AND NOT VCPKG_TARGET_ARCHITECTURE STREQUAL "x86" AND NOT VCPKG_TARGET_ARCHITECTURE STREQUAL "s390x" AND CMAKE_HOST_WIN32)
+        get_filename_component(BOOST_BUILD_PATH "${CURRENT_INSTALLED_DIR}/../x86-windows/tools/boost-build" ABSOLUTE)
+    else()
+        set(BOOST_BUILD_PATH "${CURRENT_INSTALLED_DIR}/tools/boost-build")
+    endif()
+
+    if(NOT EXISTS "${BOOST_BUILD_PATH}")
+        if(VCPKG_CMAKE_SYSTEM_NAME STREQUAL "Linux" AND VCPKG_TARGET_ARCHITECTURE STREQUAL "arm64")
+            if(CMAKE_HOST_SYSTEM_PROCESSOR STREQUAL "aarch64")
+                message(FATAL_ERROR "The arm64 boost-build tools must be installed to build arm64 for Linux. Please run `vcpkg install boost-build:arm64-linux`.")
+            else()
+                message(FATAL_ERROR "The x64 boost-build tools must be installed to build arm64 for Linux. Please run `vcpkg install boost-build:x64-linux`.")
+            endif()
+        else()
+            if(VCPKG_CMAKE_SYSTEM_NAME STREQUAL "Linux" AND CMAKE_HOST_SYSTEM_PROCESSOR STREQUAL "armv7l")
+                message(FATAL_ERROR "The arm boost-build tools must be installed to build arm64 for Linux. Please run `vcpkg install boost-build:arm-linux`.")
+            else()
+                message(FATAL_ERROR "The x86 boost-build tools must be installed to build for non-x86/x64 platforms. Please run `vcpkg install boost-build:x86-windows`.")
+            endif()
+        endif()
+    endif()
 
     if(EXISTS "${BOOST_BUILD_PATH}/b2.exe")
         set(B2_EXE "${BOOST_BUILD_PATH}/b2.exe")
@@ -96,7 +123,6 @@ function(boost_modular_build)
         if(DEFINED _bm_BOOST_CMAKE_FRAGMENT)
             list(APPEND configure_option "-DBOOST_CMAKE_FRAGMENT=${_bm_BOOST_CMAKE_FRAGMENT}")
         endif()
-
         vcpkg_configure_cmake(
             SOURCE_PATH ${CURRENT_INSTALLED_DIR}/share/boost-build
             PREFER_NINJA
@@ -106,7 +132,7 @@ function(boost_modular_build)
                 "-DCURRENT_INSTALLED_DIR=${CURRENT_INSTALLED_DIR}"
                 "-DB2_EXE=${B2_EXE}"
                 "-DSOURCE_PATH=${_bm_SOURCE_PATH}"
-                "-DBOOST_BUILD_PATH=${BOOST_BUILD_PATH} "
+                "-DBOOST_BUILD_PATH=${BOOST_BUILD_PATH}"
                 ${configure_option}
         )
         vcpkg_install_cmake()
@@ -283,12 +309,6 @@ function(boost_modular_build)
         list(APPEND B2_OPTIONS address-model=64 architecture=power)
     else()
         list(APPEND B2_OPTIONS address-model=32 architecture=x86)
-    endif()
-
-    if(VCPKG_CMAKE_SYSTEM_NAME STREQUAL MinGW)
-        message(STATUS "APPEND options")
-        list(APPEND B2_OPTIONS abi=ms binary-format=pe target-os=windows)
-        message(STATUS "Now: ${B2_OPTIONS}")
     endif()
 
     file(TO_CMAKE_PATH "${_bm_DIR}/nothing.bat" NOTHING_BAT)
