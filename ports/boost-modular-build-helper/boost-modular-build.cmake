@@ -19,7 +19,7 @@ function(boost_modular_build)
     # Todo: this serves too similar a purpose as vcpkg_find_acquire_program()
     
     message(STATUS "CMAKE_HOST_SYSTEM_NAME: ${CMAKE_HOST_SYSTEM_NAME}")
-    set(BOOST_BUILD_PATH "${CURRENT_INSTALLED_DIR}/../${VCPKG_HOST_TRIPLET}/tools/boost-build")
+    set(BOOST_BUILD_PATH "${CURRENT_HOST_INSTALLED_DIR}/tools/boost-build")
         
     message(STATUS "boost build path is: ${BOOST_BUILD_PATH}")
     
