@@ -41,6 +41,19 @@ set(RELEASE_TRIPLET ${TARGET_TRIPLET}-rel)
 set(DEBUG_TRIPLET ${TARGET_TRIPLET}-dbg)
 
 if(NOT VCPKG_TARGET_IS_WINDOWS)
+
+    if(NOT "${TARGET_TRIPLET}" STREQUAL "${HOST_TRIPLET}")
+        # cross compiling
+        set(CONFIGURE_OPTIONS "${CONFIGURE_OPTIONS} --with-cross-build=${_VCPKG_INSTALLED_DIR}/${HOST_TRIPLET}/tools/${PORT}")
+        if(VCPKG_TARGET_IS_OSX)
+            # on apple silicon we have to manually set the arch when we want x64 binaries, otherwise we get arm64 binaries
+            if(VCPKG_TARGET_ARCHITECTURE STREQUAL x64)
+                set(VCPKG_C_FLAGS "${VCPKG_C_FLAGS} -arch x86_64")
+                set(VCPKG_CXX_FLAGS "${VCPKG_CXX_FLAGS} -arch x86_64")
+            endif()
+        endif()
+    endif()
+
     set(BASH bash)
     set(VCPKG_C_FLAGS "${VCPKG_C_FLAGS} -fPIC")
     set(VCPKG_CXX_FLAGS "${VCPKG_CXX_FLAGS} -fPIC")
@@ -111,16 +124,16 @@ else()
         set(ENV{CXX} "${CMAKE_CXX_COMPILER}")
     endif()
     
-    if(CMAKE_HOST_WIN32 AND (VCPKG_TARGET_ARCHITECTURE STREQUAL "arm" OR VCPKG_TARGET_ARCHITECTURE STREQUAL "arm64") AND NOT VCPKG_CMAKE_SYSTEM_NAME STREQUAL "WindowsStore" AND NOT VCPKG_CMAKE_SYSTEM_NAME STREQUAL "MinGW")
-        set(ICU_MSVC_CROSS_COMPILE_TO_ARM ON)
-        # Need the buildtrees dir, as the required files (e.g. icucross.mk) are not part of the installed package
-        get_filename_component(ICU_HOST_PATH "${BUILDTREES_DIR}/icu/x86-windows-rel" ABSOLUTE)
-        if(NOT EXISTS "${ICU_HOST_PATH}")
-            message(FATAL_ERROR "The x86 icu must be be built locally to build for non-x86/x64 platforms. Please run `vcpkg install icu:x86-windows`.")
-        endif()
+    message(STATUS "Install to ${CURRENT_BUILDTREES_DIR}/${RELEASE_TRIPLET}")
 
+    if(NOT "${TARGET_TRIPLET}" STREQUAL "${HOST_TRIPLET}")
+        # we have to give a path to the buildtree-dir of the host system, but this folder is gone. So we have capied
+        # the relvant files to ${_VCPKG_INSTALLED_DIR}/${HOST_TRIPLET}/tools/${PORT}
+        get_filename_component(ICU_HOST_PATH "${_VCPKG_INSTALLED_DIR}/${HOST_TRIPLET}/tools/${PORT}" ABSOLUTE)
+        if(NOT EXISTS "${ICU_HOST_PATH}")
+            message(FATAL_ERROR "Please create a bug report at vcpkg.")  # can not happen (normally)
+        endif()
         set(CONFIGURE_OPTIONS "${CONFIGURE_OPTIONS} --with-cross-build=${ICU_HOST_PATH}")
-        set(ENV{PATH} "$ENV{PATH}${VCPKG_HOST_PATH_SEPARATOR}${ICU_HOST_PATH}/lib")
     endif()
 
     if(NOT DEFINED VCPKG_BUILD_TYPE OR VCPKG_BUILD_TYPE STREQUAL "release")
@@ -392,9 +405,16 @@ else()
     endforeach()
 endif()
 
-# Install executables from ${CURRENT_BUILDTREES_DIR}/${RELEASE_TRIPLET}/bin to /tools/icu
-file(GLOB ICU_TOOLS ${CURRENT_BUILDTREES_DIR}/${RELEASE_TRIPLET}/bin/*${VCPKG_HOST_EXECUTABLE_SUFFIX})
-file(INSTALL ${ICU_TOOLS} DESTINATION ${CURRENT_PACKAGES_DIR}/tools/${PORT})
+# Install executables from ${CURRENT_BUILDTREES_DIR}/${RELEASE_TRIPLET}/bin to /tools/icu/bin
+file(GLOB ICU_TOOLS
+    ${CURRENT_BUILDTREES_DIR}/${RELEASE_TRIPLET}/bin/*${VCPKG_HOST_EXECUTABLE_SUFFIX}
+    ${CURRENT_PACKAGES_DIR}/lib/icu*${ICU_VERSION_MAJOR}.dll
+)
+file(COPY ${ICU_TOOLS} DESTINATION ${CURRENT_PACKAGES_DIR}/tools/${PORT}/bin)
+
+# To cross compile, we need some files at specific positions. So lets copy them
+file(GLOB CROSS_COMPILE_DEFS ${CURRENT_BUILDTREES_DIR}/${RELEASE_TRIPLET}/config/icucross.*)
+file(INSTALL ${CROSS_COMPILE_DEFS} DESTINATION ${CURRENT_PACKAGES_DIR}/tools/${PORT}/config)
 
 # remove any remaining dlls in /lib
 file(GLOB DUMMY_DLLS ${CURRENT_PACKAGES_DIR}/lib/*.dll ${CURRENT_PACKAGES_DIR}/debug/lib/*.dll)
