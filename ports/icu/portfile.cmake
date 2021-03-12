@@ -95,17 +95,21 @@ else()
         set(CONFIGURE_OPTIONS "${CONFIGURE_OPTIONS} --host=i686-w64-mingw32")
     endif()
 
-    # Acquire tools
-    vcpkg_acquire_msys(MSYS_ROOT PACKAGES make automake1.16)
-
-    # Insert msys into the path between the compiler toolset and windows system32. This prevents masking of "link.exe" but DOES mask "find.exe".
-    string(REPLACE ";$ENV{SystemRoot}\\system32;" ";${MSYS_ROOT}/usr/bin;$ENV{SystemRoot}\\system32;" NEWPATH "$ENV{PATH}")
-    string(REPLACE ";$ENV{SystemRoot}\\System32;" ";${MSYS_ROOT}/usr/bin;$ENV{SystemRoot}\\System32;" NEWPATH "${NEWPATH}")
-    set(ENV{PATH} "${NEWPATH}")
-    set(BASH ${MSYS_ROOT}/usr/bin/bash.exe)
-
-    set(AUTOMAKE_DIR ${MSYS_ROOT}/usr/share/automake-1.16)
-    file(COPY ${AUTOMAKE_DIR}/config.guess ${AUTOMAKE_DIR}/config.sub DESTINATION ${SOURCE_PATH}/source)
+    if(WIN32)
+        # Acquire tools
+        vcpkg_acquire_msys(MSYS_ROOT PACKAGES make automake1.16)
+        
+        # Insert msys into the path between the compiler toolset and windows system32. This prevents masking of "link.exe" but DOES mask "find.exe".
+        string(REPLACE ";$ENV{SystemRoot}\\system32;" ";${MSYS_ROOT}/usr/bin;$ENV{SystemRoot}\\system32;" NEWPATH "$ENV{PATH}")
+        string(REPLACE ";$ENV{SystemRoot}\\System32;" ";${MSYS_ROOT}/usr/bin;$ENV{SystemRoot}\\System32;" NEWPATH "${NEWPATH}")
+        set(ENV{PATH} "${NEWPATH}")
+        set(BASH ${MSYS_ROOT}/usr/bin/bash.exe)
+        
+        set(AUTOMAKE_DIR ${MSYS_ROOT}/usr/share/automake-1.16)
+        file(COPY ${AUTOMAKE_DIR}/config.guess ${AUTOMAKE_DIR}/config.sub DESTINATION ${SOURCE_PATH}/source)
+    else()
+        set(BASH bash)
+    endif()
 
     if(NOT VCPKG_TARGET_IS_MINGW)
         set(PLATFORM "MSYS/MSVC")
@@ -120,9 +124,15 @@ else()
         set(DEBUG_LDFLAGS "-DEBUG")
     else()
         set(PLATFORM "MinGW")
+        set(CMAKE_C_COMPILER /usr/src/mxe/usr/bin/x86_64-w64-mingw32.shared.posix-gcc)
+        set(CMAKE_CXX_COMPILER /usr/src/mxe/usr/bin/x86_64-w64-mingw32.shared.posix-g++)
         set(ENV{CC} "${CMAKE_C_COMPILER}")
         set(ENV{CXX} "${CMAKE_CXX_COMPILER}")
+        # set(ENV{CPP} "${CMAKE_CXX_COMPILER}")
     endif()
+
+    message(STATUS "Compilers: ${CMAKE_C_COMPILER} ${CMAKE_CXX_COMPILER}")
+    message(STATUS "Compilers: $ENV{CC} $ENV{CPP} $ENV{CPP}")
     
     message(STATUS "Install to ${CURRENT_BUILDTREES_DIR}/${RELEASE_TRIPLET}")
 

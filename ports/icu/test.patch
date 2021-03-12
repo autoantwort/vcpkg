@@ -1,0 +1,15 @@
+diff --git a/icu4c/source/config/mh-mingw64 b/icu4c/source/config/mh-mingw64
+index ca0b8d47c6..2c23bdaed6 100644
+--- a/icu4c/source/config/mh-mingw64
++++ b/icu4c/source/config/mh-mingw64
+@@ -43,8 +43,8 @@ SHAREDLIBCXXFLAGS =
+ SHAREDLIBCPPFLAGS = -DPIC
+ 
+ ## Additional flags when building libraries and with threads
+-THREADSCFLAGS = -mthreads
+-THREADSCXXFLAGS = -mthreads
++THREADSCFLAGS = -pthread
++THREADSCXXFLAGS = -pthread
+ LIBCPPFLAGS =
+ 
+ ## Add 'd' suffix to the names of binary files with Debug configuration
