@@ -9,6 +9,10 @@ vcpkg_from_github(
     SHA512 1df2c9d3c119a2ec7b8b8940bff7ba6d28fe99587f565066ae25c216021431d3c26c8b336c38dd0490165244c66d68f9cba20dfc7836042b62f9d588946be4b5
 )
 
+if(VCPKG_TARGET_IS_MINGW)
+    set(VCPKG_MAKE_BUILD_TRIPLET "--host=mingw32")
+endif()
+
 vcpkg_configure_make(
     SOURCE_PATH ${SOURCE_PATH}
     AUTOCONFIG
