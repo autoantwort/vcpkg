@@ -286,9 +286,11 @@ function(vcpkg_configure_make)
     endif()
 
     # Pre-processing windows configure requirements
-    if (CMAKE_HOST_WIN32)
-        list(APPEND MSYS_REQUIRE_PACKAGES binutils libtool autoconf automake-wrapper automake1.16 m4)
-        vcpkg_acquire_msys(MSYS_ROOT PACKAGES ${MSYS_REQUIRE_PACKAGES} ${_csc_ADDITIONAL_MSYS_PACKAGES})
+    if (VCPKG_TARGET_IS_WINDOWS)
+        if(CMAKE_HOST_WIN32)
+            list(APPEND MSYS_REQUIRE_PACKAGES binutils libtool autoconf automake-wrapper automake1.16 m4)
+            vcpkg_acquire_msys(MSYS_ROOT PACKAGES ${MSYS_REQUIRE_PACKAGES} ${_csc_ADDITIONAL_MSYS_PACKAGES})
+        endif()
         if (_csc_AUTOCONFIG AND NOT _csc_BUILD_TRIPLET OR _csc_DETERMINE_BUILD_TRIPLET)
             _vcpkg_determine_autotools_host_cpu(BUILD_ARCH) # VCPKG_HOST => machine you are building on => --build=
             _vcpkg_determine_autotools_target_cpu(TARGET_ARCH)
@@ -308,16 +310,18 @@ function(vcpkg_configure_make)
             endif()
             debug_message("Using make triplet: ${_csc_BUILD_TRIPLET}")
         endif()
-        set(APPEND_ENV)
-        if(_csc_AUTOCONFIG OR _csc_USE_WRAPPERS)
-            set(APPEND_ENV ";${MSYS_ROOT}/usr/share/automake-1.16")
-            string(APPEND APPEND_ENV ";${SCRIPTS}/buildsystems/make_wrapper") # Other required wrappers are also located there
+        if(CMAKE_HOST_WIN32)
+            set(APPEND_ENV)
+            if(_csc_AUTOCONFIG OR _csc_USE_WRAPPERS)
+                set(APPEND_ENV ";${MSYS_ROOT}/usr/share/automake-1.16")
+                string(APPEND APPEND_ENV ";${SCRIPTS}/buildsystems/make_wrapper") # Other required wrappers are also located there
+            endif()
+            # This inserts msys before system32 (which masks sort.exe and find.exe) but after MSVC (which avoids masking link.exe)
+            string(REPLACE ";$ENV{SystemRoot}\\System32;" "${APPEND_ENV};${MSYS_ROOT}/usr/bin;$ENV{SystemRoot}\\System32;" NEWPATH "$ENV{PATH}")
+            string(REPLACE ";$ENV{SystemRoot}\\system32;" "${APPEND_ENV};${MSYS_ROOT}/usr/bin;$ENV{SystemRoot}\\system32;" NEWPATH "$ENV{PATH}")
+            set(ENV{PATH} "${NEWPATH}")
+            set(BASH "${MSYS_ROOT}/usr/bin/bash.exe")
         endif()
-        # This inserts msys before system32 (which masks sort.exe and find.exe) but after MSVC (which avoids masking link.exe)
-        string(REPLACE ";$ENV{SystemRoot}\\System32;" "${APPEND_ENV};${MSYS_ROOT}/usr/bin;$ENV{SystemRoot}\\System32;" NEWPATH "$ENV{PATH}")
-        string(REPLACE ";$ENV{SystemRoot}\\system32;" "${APPEND_ENV};${MSYS_ROOT}/usr/bin;$ENV{SystemRoot}\\system32;" NEWPATH "$ENV{PATH}")
-        set(ENV{PATH} "${NEWPATH}")
-        set(BASH "${MSYS_ROOT}/usr/bin/bash.exe")
 
         macro(_vcpkg_append_to_configure_environment inoutstring var defaultval)
             # Allows to overwrite settings in custom triplets via the environment
@@ -401,12 +405,6 @@ function(vcpkg_configure_make)
         # LINK This is the command used to actually link a C program.
         # CXXCOMPILE The command used to actually compile a C++ source file. The file name is appended to form the complete command line. 
         # CXXLINK  The command used to actually link a C++ program. 
-    
-        #Some PATH handling for dealing with spaces....some tools will still fail with that!
-        string(REPLACE " " "\\\ " _VCPKG_PREFIX ${CURRENT_INSTALLED_DIR})
-        string(REGEX REPLACE "([a-zA-Z]):/" "/\\1/" _VCPKG_PREFIX "${_VCPKG_PREFIX}")
-        set(_VCPKG_INSTALLED ${CURRENT_INSTALLED_DIR})
-        set(prefix_var "'\${prefix}'") # Windows needs extra quotes or else the variable gets expanded in the makefile!
 
         # Variables not correctly detected by configure. In release builds.
         list(APPEND _csc_OPTIONS gl_cv_double_slash_root=yes
@@ -420,6 +418,14 @@ function(vcpkg_configure_make)
             # Currently needed for arm because objdump yields: "unrecognised machine type (0x1c4) in Import Library Format archive"
             list(APPEND _csc_OPTIONS lt_cv_deplibs_check_method=pass_all)
         endif()
+    endif()
+    
+    if(CMAKE_HOST_WIN32)
+        #Some PATH handling for dealing with spaces....some tools will still fail with that!
+        string(REPLACE " " "\\\ " _VCPKG_PREFIX ${CURRENT_INSTALLED_DIR})
+        string(REGEX REPLACE "([a-zA-Z]):/" "/\\1/" _VCPKG_PREFIX "${_VCPKG_PREFIX}")
+        set(_VCPKG_INSTALLED ${CURRENT_INSTALLED_DIR})
+        set(prefix_var "'\${prefix}'") # Windows needs extra quotes or else the variable gets expanded in the makefile!
     else()
         string(REPLACE " " "\ " _VCPKG_PREFIX ${CURRENT_INSTALLED_DIR})
         string(REPLACE " " "\ " _VCPKG_INSTALLED ${CURRENT_INSTALLED_DIR})
@@ -733,8 +739,13 @@ function(vcpkg_configure_make)
         unset(_link_path)
         unset(_lib_env_vars)
 
-        if (CMAKE_HOST_WIN32)
-            set(command ${base_cmd} -c "${CONFIGURE_ENV} ./${RELATIVE_BUILD_PATH}/configure ${_csc_BUILD_TRIPLET} ${_csc_OPTIONS} ${_csc_OPTIONS_${_buildtype}}")
+        if(VCPKG_TARGET_IS_WINDOWS)
+            if (CMAKE_HOST_WIN32)
+                set(command ${base_cmd} -c "${CONFIGURE_ENV} ./${RELATIVE_BUILD_PATH}/configure ${_csc_BUILD_TRIPLET} ${_csc_OPTIONS} ${_csc_OPTIONS_${_buildtype}}")
+            else()
+                find_program(BASH bash REQUIRED)
+                set(command "${BASH}" -c "${CONFIGURE_ENV} ./${RELATIVE_BUILD_PATH}/configure ${_csc_BUILD_TRIPLET} ${_csc_OPTIONS} ${_csc_OPTIONS_${_buildtype}}")
+            endif()
         else()
             find_program(BASH bash REQUIRED)
             set(command "${BASH}" "./${RELATIVE_BUILD_PATH}/configure" ${_csc_BUILD_TRIPLET} ${_csc_OPTIONS} ${_csc_OPTIONS_${_buildtype}})
