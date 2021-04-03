@@ -87,6 +87,15 @@ function(vcpkg_build_make)
     set(MAKE )
     set(MAKE_OPTS )
     set(INSTALL_OPTS )
+
+    if(VCPKG_TARGET_IS_WINDOWS)
+        string(REPLACE " " "\\\ " DESTDIR ${CURRENT_PACKAGES_DIR})
+        # Don't know why '/cygdrive' is suddenly a requirement here. (at least for x264)
+        string(REGEX REPLACE "([a-zA-Z]):/" "/cygdrive/\\1/" DESTDIR "${DESTDIR}")
+    else()
+        set(DESTDIR ${CURRENT_PACKAGES_DIR})
+    endif()
+
     if (CMAKE_HOST_WIN32)
         set(PATH_GLOBAL "$ENV{PATH}")
         vcpkg_add_to_path(PREPEND "${SCRIPTS}/buildsystems/make_wrapper")
@@ -96,10 +105,7 @@ function(vcpkg_build_make)
         set(MAKE_OPTS ${_bc_MAKE_OPTIONS} -j ${VCPKG_CONCURRENCY} --trace -f ${_bc_MAKEFILE} ${_bc_BUILD_TARGET})
         set(NO_PARALLEL_MAKE_OPTS ${_bc_MAKE_OPTIONS} -j 1 --trace -f ${_bc_MAKEFILE} ${_bc_BUILD_TARGET})
 
-        string(REPLACE " " "\\\ " _VCPKG_PACKAGE_PREFIX ${CURRENT_PACKAGES_DIR})
-        # Don't know why '/cygdrive' is suddenly a requirement here. (at least for x264)
-        string(REGEX REPLACE "([a-zA-Z]):/" "/cygdrive/\\1/" _VCPKG_PACKAGE_PREFIX "${_VCPKG_PACKAGE_PREFIX}")
-        set(INSTALL_OPTS -j ${VCPKG_CONCURRENCY} --trace -f ${_bc_MAKEFILE} ${_bc_INSTALL_TARGET} DESTDIR=${_VCPKG_PACKAGE_PREFIX})
+        set(INSTALL_OPTS -j ${VCPKG_CONCURRENCY} --trace -f ${_bc_MAKEFILE} ${_bc_INSTALL_TARGET} DESTDIR=${DESTDIR})
         #TODO: optimize for install-data (release) and install-exec (release/debug)
     else()
         # Compiler requriements
@@ -112,7 +118,7 @@ function(vcpkg_build_make)
         # Set make command and install command
         set(MAKE_OPTS ${_bc_MAKE_OPTIONS} V=1 -j ${VCPKG_CONCURRENCY} -f ${_bc_MAKEFILE} ${_bc_BUILD_TARGET})
         set(NO_PARALLEL_MAKE_OPTS ${_bc_MAKE_OPTIONS} V=1 -j 1 -f ${_bc_MAKEFILE} ${_bc_BUILD_TARGET})
-        set(INSTALL_OPTS -j ${VCPKG_CONCURRENCY} -f ${_bc_MAKEFILE} ${_bc_INSTALL_TARGET} DESTDIR=${CURRENT_PACKAGES_DIR})
+        set(INSTALL_OPTS -j ${VCPKG_CONCURRENCY} -f ${_bc_MAKEFILE} ${_bc_INSTALL_TARGET} DESTDIR=${DESTDIR})
     endif()
 
     # Since includes are buildtype independent those are setup by vcpkg_configure_make
