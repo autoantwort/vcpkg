@@ -106,23 +106,7 @@ macro(_vcpkg_determine_host_mingw out_var)
 endmacro()
 
 macro(_vcpkg_determine_autotools_host_cpu out_var)
-    if(DEFINED ENV{PROCESSOR_ARCHITEW6432})
-        set(HOST_ARCH $ENV{PROCESSOR_ARCHITEW6432})
-    else()
-        set(HOST_ARCH $ENV{PROCESSOR_ARCHITECTURE})
-    endif()
-    if(HOST_ARCH MATCHES "(amd|AMD)64")
-        set(${out_var} x86_64)
-    elseif(HOST_ARCH MATCHES "(x|X)86")
-        set(${out_var} i686)
-    elseif(HOST_ARCH MATCHES "^(ARM|arm)64$")
-        set(${out_var} aarch64)
-    elseif(HOST_ARCH MATCHES "^(ARM|arm)$")
-        set(${out_var} arm)
-    else()
-        message(FATAL_ERROR "Unsupported host architecture ${HOST_ARCH} in _vcpkg_determine_autotools_host_cpu!" )
-    endif()
-    unset(HOST_ARCH)
+    set(${out_var} "${VCPKG_DETECTED_CMAKE_HOST_SYSTEM_PROCESSOR}")
 endmacro()
 
 macro(_vcpkg_determine_autotools_target_cpu out_var)
@@ -303,9 +287,11 @@ function(vcpkg_configure_make)
             # --target: the machine that CC will produce binaries for
             # https://stackoverflow.com/questions/21990021/how-to-determine-host-value-for-configure-when-using-cross-compiler
             # Only for ports using autotools so we can assume that they follow the common conventions for build/target/host
-            set(_csc_BUILD_TRIPLET "--build=${BUILD_ARCH}-pc-mingw32")  # This is required since we are running in a msys
-                                                                        # shell which will be otherwise identified as ${BUILD_ARCH}-pc-msys
-            if(NOT TARGET_ARCH MATCHES "${BUILD_ARCH}") # we don't need to specify the additional flags if we build nativly. 
+            if(CMAKE_HOST_WIN32)
+                set(_csc_BUILD_TRIPLET "--build=${BUILD_ARCH}-pc-mingw32")  # This is required since we are running in a msys
+                                                                            # shell which will be otherwise identified as ${BUILD_ARCH}-pc-msys
+            endif()
+            if(NOT TARGET_ARCH MATCHES "${BUILD_ARCH}" OR NOT CMAKE_HOST_WIN32) # we don't need to specify the additional flags if we build nativly, this does not hold when we are not on windows 
                 string(APPEND _csc_BUILD_TRIPLET " --host=${TARGET_ARCH}-pc-mingw32") # (Host activates crosscompilation; The name given here is just the prefix of the host tools for the target)
             endif()
             if(VCPKG_TARGET_IS_UWP AND NOT _csc_BUILD_TRIPLET MATCHES "--host")
