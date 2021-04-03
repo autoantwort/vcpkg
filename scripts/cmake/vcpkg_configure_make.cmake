@@ -291,7 +291,11 @@ function(vcpkg_configure_make)
             list(APPEND MSYS_REQUIRE_PACKAGES binutils libtool autoconf automake-wrapper automake1.16 m4)
             vcpkg_acquire_msys(MSYS_ROOT PACKAGES ${MSYS_REQUIRE_PACKAGES} ${_csc_ADDITIONAL_MSYS_PACKAGES})
         endif()
-        if (_csc_AUTOCONFIG AND NOT _csc_BUILD_TRIPLET OR _csc_DETERMINE_BUILD_TRIPLET)
+        message(STATUS "VCPKG_CROSSCOMPILING ${VCPKG_CROSSCOMPILING}")
+        message(STATUS "_csc_BUILD_TRIPLET ${_csc_BUILD_TRIPLET}")
+        message(STATUS "_csc_DETERMINE_BUILD_TRIPLET ${_csc_DETERMINE_BUILD_TRIPLET}")
+        message(STATUS "_csc_AUTOCONFIG ${_csc_AUTOCONFIG}")
+        if (_csc_AUTOCONFIG AND NOT _csc_BUILD_TRIPLET OR _csc_DETERMINE_BUILD_TRIPLET OR VCPKG_CROSSCOMPILING AND NOT _csc_BUILD_TRIPLET)
             _vcpkg_determine_autotools_host_cpu(BUILD_ARCH) # VCPKG_HOST => machine you are building on => --build=
             _vcpkg_determine_autotools_target_cpu(TARGET_ARCH)
             # --build: the machine you are building on
