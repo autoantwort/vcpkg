@@ -324,8 +324,8 @@ function(vcpkg_configure_make)
         endif()
 
         macro(_vcpkg_append_to_configure_environment inoutstring var defaultval)
-            # Allows to overwrite settings in custom triplets via the environment
-            if(DEFINED ENV{${var}})
+            # Allows to overwrite settings in custom triplets via the environment on windows
+            if(CMAKE_HOST_WIN32 AND DEFINED ENV{${var}})
                 string(APPEND ${inoutstring} " ${var}='$ENV{${var}}'")
             else()
                 string(APPEND ${inoutstring} " ${var}='${defaultval}'")
