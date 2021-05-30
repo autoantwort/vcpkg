@@ -16,10 +16,11 @@ vcpkg_extract_source_archive_ex(
     OUT_SOURCE_PATH SOURCE_PATH
     ARCHIVE ${ARCHIVE}
     PATCHES
-        ${CMAKE_CURRENT_LIST_DIR}/disable-escapestr-tool.patch
-        ${CMAKE_CURRENT_LIST_DIR}/remove-MD-from-configure.patch
-        ${CMAKE_CURRENT_LIST_DIR}/fix_parallel_build_on_windows.patch
-        ${CMAKE_CURRENT_LIST_DIR}/fix-extra.patch
+        disable-escapestr-tool.patch
+        remove-MD-from-configure.patch
+        fix_parallel_build_on_windows.patch
+        fix-extra.patch
+        fix-mingw.patch
 )
 
 vcpkg_find_acquire_program(PYTHON3)
@@ -33,9 +34,12 @@ list(APPEND CONFIGURE_OPTIONS_DEBUG  --enable-debug --disable-release)
 set(RELEASE_TRIPLET ${TARGET_TRIPLET}-rel)
 set(DEBUG_TRIPLET ${TARGET_TRIPLET}-dbg)
 
-if(NOT "${TARGET_TRIPLET}" STREQUAL "${HOST_TRIPLET}")
+if(VCPKG_CROSSCOMPILING)
     # cross compiling
-    list(APPEND CONFIGURE_OPTIONS "--with-cross-build=${_VCPKG_INSTALLED_DIR}/${HOST_TRIPLET}/tools/${PORT}")
+    # for mingw on windows we must not set --with-cross-build, see https://github.com/unicode-org/icu/pull/1733#discussion_r641305290
+    if(NOT (VCPKG_TARGET_IS_MINGW AND CMAKE_HOST_WIN32))
+        list(APPEND CONFIGURE_OPTIONS "--with-cross-build=${_VCPKG_INSTALLED_DIR}/${HOST_TRIPLET}/tools/${PORT}")
+    endif()
 endif()
 
 if(VCPKG_TARGET_IS_WINDOWS)
