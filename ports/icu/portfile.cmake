@@ -140,15 +140,6 @@ else()
     vcpkg_install_make()
 endif()
 
-if(VCPKG_TARGET_IS_MINGW)
-    file(GLOB ICU_TOOLS
-        ${CURRENT_PACKAGES_DIR}/bin/*${VCPKG_HOST_EXECUTABLE_SUFFIX}
-        ${CURRENT_PACKAGES_DIR}/debug/bin/*${VCPKG_HOST_EXECUTABLE_SUFFIX}
-        ${CURRENT_PACKAGES_DIR}/bin/icu-config
-        ${CURRENT_PACKAGES_DIR}/debug/bin/icu-config)
-    file(REMOVE ${ICU_TOOLS})
-endif()
-
 file(REMOVE_RECURSE
     ${CURRENT_PACKAGES_DIR}/share
     ${CURRENT_PACKAGES_DIR}/debug/share
