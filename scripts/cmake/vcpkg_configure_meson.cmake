@@ -283,12 +283,7 @@ function(vcpkg_internal_meson_generate_cross_file _additional_binaries) #https:/
         if(VCPKG_DETECTED_CMAKE_${prog}_COMPILER)
             string(REPLACE "CXX" "CPP" mesonprog "${prog}")
             string(TOLOWER "${mesonprog}" proglower)
-            if(VCPKG_TARGET_IS_MINGW AND VCPKG_DETECTED_CMAKE_LINKER)
-                # for gcc and clang cpp_ld should be an argument to -fuse-ld=, see https://github.com/mesonbuild/meson/issues/8647
-                string(APPEND CROSS "${proglower} = '${VCPKG_DETECTED_CMAKE_${prog}_COMPILER}' -fuse-ld='${VCPKG_DETECTED_CMAKE_LINKER}'\n")
-            else()
-                string(APPEND CROSS "${proglower} = '${VCPKG_DETECTED_CMAKE_${prog}_COMPILER}'\n")
-            endif()
+            string(APPEND CROSS "${proglower} = '${VCPKG_DETECTED_CMAKE_${prog}_COMPILER}'\n")
         endif()
     endforeach()
     if(VCPKG_DETECTED_CMAKE_LINKER AND VCPKG_TARGET_IS_WINDOWS AND NOT VCPKG_TARGET_IS_MINGW)
