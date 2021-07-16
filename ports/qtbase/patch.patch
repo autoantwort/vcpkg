@@ -1,5 +1,5 @@
 diff --git a/cmake/QtModuleHelpers.cmake b/cmake/QtModuleHelpers.cmake
-index 090e1343b0..86d578838d 100644
+index 090e1343b0..e5b2e00bb5 100644
 --- a/cmake/QtModuleHelpers.cmake
 +++ b/cmake/QtModuleHelpers.cmake
 @@ -278,7 +278,7 @@ function(qt_internal_add_module target)
@@ -11,7 +11,7 @@ index 090e1343b0..86d578838d 100644
                                   -quiet
                                   -check-includes
                                   -module "${module_include_name}"
-@@ -286,7 +286,18 @@ function(qt_internal_add_module target)
+@@ -286,7 +286,20 @@ function(qt_internal_add_module target)
                                   -outdir "${QT_BUILD_DIR}"
                                   -builddir "${PROJECT_BINARY_DIR}"
                                   "${PROJECT_SOURCE_DIR}")
@@ -21,6 +21,8 @@ index 090e1343b0..86d578838d 100644
 +        if(NOT syncqt_ret EQUAL 0)
 +            message(FATAL_ERROR "Failed to run ${HOST_PERL}, return code: ${syncqt_ret}")
 +        endif()
++        find_program(HOST_PERL2 "perl" DOC "Perl binary")
++        message(STATUS "Test ${HOST_PERL2}")
 +        set(HOST_PERL "/usr/bin/perl")
 +        message(STATUS "Test ${HOST_PERL}")
 +        execute_process(COMMAND "${HOST_PERL}" "--version" RESULT_VARIABLE syncqt_ret)
