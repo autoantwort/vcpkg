@@ -1,7 +1,16 @@
 diff --git a/cmake/QtModuleHelpers.cmake b/cmake/QtModuleHelpers.cmake
-index 090e1343b0..26e73f9ff6 100644
+index 090e1343b0..e0dad2bc44 100644
 --- a/cmake/QtModuleHelpers.cmake
 +++ b/cmake/QtModuleHelpers.cmake
+@@ -278,7 +278,7 @@ function(qt_internal_add_module target)
+         # So we either write the generated files into the qtbase non-prefix build root, or the
+         # module specific build root.
+         qt_ensure_sync_qt()
+-        set(syncqt_full_command "${HOST_PERL}" -w "${QT_SYNCQT}"
++        set(syncqt_full_command ${HOST_PERL} -w "${QT_SYNCQT}"
+                                  -quiet
+                                  -check-includes
+                                  -module "${module_include_name}"
 @@ -286,7 +286,12 @@ function(qt_internal_add_module target)
                                   -outdir "${QT_BUILD_DIR}"
                                   -builddir "${PROJECT_BINARY_DIR}"
