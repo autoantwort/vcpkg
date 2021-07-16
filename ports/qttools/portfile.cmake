@@ -36,6 +36,7 @@ vcpkg_check_features(OUT_FEATURE_OPTIONS FEATURE_OPTIONS
     FEATURES
     "assistant" FEATURE_assistant
     "designer" FEATURE_designer
+    "designer" FEATURE_linguist # https://bugreports.qt.io/browse/QTBUG-95236
     INVERTED_FEATURES
     "qdoc"   CMAKE_DISABLE_FIND_PACKAGE_Clang
     "qdoc"   CMAKE_DISABLE_FIND_PACKAGE_WrapLibClang
@@ -75,8 +76,8 @@ endif()
 ### Download third_party modules
 vcpkg_from_git(
     OUT_SOURCE_PATH SOURCE_PATH_QLITEHTML
-    URL git://code.qt.io/playground/qlitehtml.git
-    REF 908670c5b68d3bcf4712019a028079b8b2042dd4
+    URL git://code.qt.io/playground/qlitehtml.git # git://code.qt.io/playground/qlitehtml.git
+    REF 6af5648d1208ed5760d74bd060c74ffa2bcfef6b
 )
 # port 'litehtml' is not in vcpkg!
 vcpkg_from_github(
