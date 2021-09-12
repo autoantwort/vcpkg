@@ -1,8 +1,8 @@
 vcpkg_from_github(
     OUT_SOURCE_PATH SOURCE_PATH
     REPO tcltk/tcl
-    REF 0fa6a4e5aad821a5c34fdfa070c37c3f1ffc8c8e
-    SHA512 9d7f35309fe8b1a7c116639aaea50cc01699787c7afb432389bee2b9ad56a67034c45d90c9585ef1ccf15bdabf0951cbef86257c0c6aedbd2591bbfae3e93b76
+    REF core-8-6-10
+    SHA512 ad7096bbb579afb6969b0a3db4d797078dbc78c204c76d3dd2f2cc7b6109135c547e151c3dd1282fbf1d51b448da6c663868fcfec2b544e68e89e5104591761c
     PATCHES force-shell-install.patch
 )
 
@@ -47,12 +47,12 @@ if (VCPKG_TARGET_IS_WINDOWS)
         OPTIONS_DEBUG
             ${TCL_BUILD_OPTS},symbols
             INSTALLDIR=${CURRENT_PACKAGES_DIR}/debug
-            SCRIPT_INSTALL_DIR=${CURRENT_PACKAGES_DIR}/tools/tcl/debug/lib/tcl9.0
+            SCRIPT_INSTALL_DIR=${CURRENT_PACKAGES_DIR}/tools/tcl/debug/lib/tcl8.6
         OPTIONS_RELEASE
             release
             ${TCL_BUILD_OPTS}
             INSTALLDIR=${CURRENT_PACKAGES_DIR}
-            SCRIPT_INSTALL_DIR=${CURRENT_PACKAGES_DIR}/tools/tcl/lib/tcl9.0
+            SCRIPT_INSTALL_DIR=${CURRENT_PACKAGES_DIR}/tools/tcl/lib/tcl8.6
     )
 
 
@@ -121,9 +121,10 @@ if (VCPKG_TARGET_IS_WINDOWS)
     file(REMOVE_RECURSE ${CURRENT_PACKAGES_DIR}/debug/include)
     
 else()
-    file(REMOVE "${SOURCE_PATH}/unix/configure")
+    # file(REMOVE "${SOURCE_PATH}/unix/configure")
     vcpkg_configure_make(
         SOURCE_PATH ${SOURCE_PATH}
+        NO_ADDITIONAL_PATHS
         PROJECT_SUBPATH unix
     )
     

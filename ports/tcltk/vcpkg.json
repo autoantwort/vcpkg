@@ -1,0 +1,6 @@
+{
+  "name": "tcltk",
+  "version": "8.6.11",
+  "description": "The Tk Widget Toolkit For Tcl",
+  "homepage": "https://github.com/tcltk/tk"
+}
