@@ -11,7 +11,7 @@ vcpkg_from_github(
         0003-build-static-or-shared-not-both.patch
         0004-android-and-mingw-fixes.patch
 )
-
+# test chane
 # This is generated during the cmake build
 file(REMOVE "${SOURCE_PATH}/zconf.h")
 
