@@ -4,9 +4,6 @@ on:
   push:
     branches:
       - 'version-staging'
-    paths:
-      - 'ports/**'
-      - '!versions/**'
 
 jobs:
   build:
@@ -49,6 +46,7 @@ jobs:
             const changed_ports_content = (await fs.readFile('.changed-ports', 'utf8')).trim()
             console.log("File content:", changed_ports_content);
             if (changed_ports_content === "") {
+              await fs.rm('.changed-ports')
               return; // nothing to do, no port change
             }
             const changed_ports = changed_ports_content.split('\n');
@@ -78,14 +76,16 @@ jobs:
       - name: Format, add versions and commit
         run: |
           unset VCPKG_ROOT
-          ./vcpkg format-manifest --all
-          git add ports
-          git commit --amend --no-edit
-          ./vcpkg x-add-version --all
-          git add versions
-          git commit --amend --no-edit
-          git status
-          git push -f 
+          if [ -f ".changed-ports" ];then
+            ./vcpkg format-manifest --all
+            git add ports
+            git commit --amend --no-edit
+            ./vcpkg x-add-version --all
+            git add versions
+            git commit --amend --no-edit
+            git status
+            git push -f
+          fi
           git checkout master
           git merge --ff-only -
           git push -f
