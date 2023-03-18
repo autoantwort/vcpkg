@@ -502,14 +502,16 @@ function(vcpkg_configure_make)
                             #"--includedir='\${prefix}'/include" # already the default!
                             "--mandir=\\\${prefix}/share/${PORT}"
                             "--docdir=\\\${prefix}/share/${PORT}"
-                            "--datarootdir=\\\${prefix}/share/${PORT}")
+                            "--datarootdir=\\\${prefix}/share/${PORT}"
+                            "--cache-file=\\\${prefix}/share/${PORT}/config-rel.cache")
         set(arg_OPTIONS_DEBUG ${arg_OPTIONS_DEBUG}
                             # Important: These should all be relative to prefix!
                             "--bindir=\\\${prefix}/../tools/${PORT}/debug/bin"
                             "--sbindir=\\\${prefix}/../tools/${PORT}/debug/sbin"
                             "--libdir=\\\${prefix}/lib" # On some Linux distributions lib64 is the default
                             "--includedir=\\\${prefix}/../include"
-                            "--datarootdir=\\\${prefix}/share/${PORT}")
+                            "--datarootdir=\\\${prefix}/share/${PORT}"
+                            "--cache-file=\\\${prefix}/share/${PORT}/config-dbg.cache")
     endif()
     # Setup common options
     if(NOT arg_DISABLE_VERBOSE_FLAGS)
