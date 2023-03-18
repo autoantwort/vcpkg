@@ -490,9 +490,9 @@ function(vcpkg_configure_make)
                         "${CURRENT_BUILDTREES_DIR}/${TARGET_TRIPLET}")
 
     # Set configure paths
-    set(arg_OPTIONS_RELEASE ${arg_OPTIONS_RELEASE} "--prefix=${z_vcpkg_prefix_path}")
-    set(arg_OPTIONS_DEBUG ${arg_OPTIONS_DEBUG} "--prefix=${z_vcpkg_prefix_path}/debug")
     file(MAKE_DIRECTORY "${CURRENT_PACKAGES_DIR}/cache/${PORT}")
+    set(arg_OPTIONS_RELEASE ${arg_OPTIONS_RELEASE} "--prefix=${z_vcpkg_prefix_path}" "--cache-file=${CURRENT_PACKAGES_DIR}/cache/${PORT}/config-rel.cache")
+    set(arg_OPTIONS_DEBUG ${arg_OPTIONS_DEBUG} "--prefix=${z_vcpkg_prefix_path}/debug" "--cache-file=${CURRENT_PACKAGES_DIR}/cache/${PORT}/config-dbg.cache")
     if(NOT arg_NO_ADDITIONAL_PATHS)
         # ${prefix} has an extra backslash to prevent early expansion when calling `bash -c configure "..."`.
         set(arg_OPTIONS_RELEASE ${arg_OPTIONS_RELEASE}
@@ -503,16 +503,14 @@ function(vcpkg_configure_make)
                             #"--includedir='\${prefix}'/include" # already the default!
                             "--mandir=\\\${prefix}/share/${PORT}"
                             "--docdir=\\\${prefix}/share/${PORT}"
-                            "--datarootdir=\\\${prefix}/share/${PORT}"
-                            "--cache-file=${CURRENT_PACKAGES_DIR}/cache/${PORT}/config-rel.cache")
+                            "--datarootdir=\\\${prefix}/share/${PORT}")
         set(arg_OPTIONS_DEBUG ${arg_OPTIONS_DEBUG}
                             # Important: These should all be relative to prefix!
                             "--bindir=\\\${prefix}/../tools/${PORT}/debug/bin"
                             "--sbindir=\\\${prefix}/../tools/${PORT}/debug/sbin"
                             "--libdir=\\\${prefix}/lib" # On some Linux distributions lib64 is the default
                             "--includedir=\\\${prefix}/../include"
-                            "--datarootdir=\\\${prefix}/share/${PORT}"
-                            "--cache-file=${CURRENT_PACKAGES_DIR}/cache/${PORT}/config-dbg.cache")
+                            "--datarootdir=\\\${prefix}/share/${PORT}")
     endif()
     # Setup common options
     if(NOT arg_DISABLE_VERBOSE_FLAGS)
