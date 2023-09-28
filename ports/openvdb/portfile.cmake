@@ -15,31 +15,20 @@ file(REMOVE "${SOURCE_PATH}/cmake/FindOpenEXR.cmake")
 string(COMPARE EQUAL "${VCPKG_LIBRARY_LINKAGE}" "static" OPENVDB_STATIC)
 string(COMPARE EQUAL "${VCPKG_LIBRARY_LINKAGE}" "dynamic" OPENVDB_SHARED)
 
-set(OPENVDB_BUILD_TOOLS OFF)
-if ("tools" IN_LIST FEATURES)
-  if (VCPKG_LIBRARY_LINKAGE STREQUAL dynamic)
-    set(OPENVDB_BUILD_TOOLS ON)
-  else()
-    message(FATAL_ERROR "Unable to build tools if static libraries are required")
-  endif()
-endif()
-
-if ("ax" IN_LIST FEATURES)
-  if(NOT VCPKG_TARGET_IS_WINDOWS)
-    set(OPENVDB_BUILD_AX ON)
-  else()
-    message(FATAL_ERROR "Currently no support for building OpenVDB AX on Windows.")  
-  endif()
-endif()
+vcpkg_check_features(
+    OUT_FEATURE_OPTIONS FEATURE_OPTIONS
+    FEATURES
+        "tools" OPENVDB_BUILD_TOOLS
+        "ax"    OPENVDB_BUILD_AX
+)
 
 vcpkg_cmake_configure(
     SOURCE_PATH "${SOURCE_PATH}"
     OPTIONS
         -DOPENVDB_BUILD_UNITTESTS=OFF
         -DOPENVDB_BUILD_PYTHON_MODULE=OFF
-        -DOPENVDB_ENABLE_3_ABI_COMPATIBLE=OFF
+        -DOPENVDB_3_ABI_COMPATIBLE=OFF
         -DUSE_EXR=ON
-        -DUSE_GLFW3=ON
         -DUSE_IMATH_HALF=ON
         -DOPENVDB_CORE_STATIC=${OPENVDB_STATIC}
         -DOPENVDB_CORE_SHARED=${OPENVDB_SHARED}
@@ -48,7 +37,10 @@ vcpkg_cmake_configure(
         -DOPENVDB_BUILD_VDB_RENDER=${OPENVDB_BUILD_TOOLS}
         -DOPENVDB_BUILD_VDB_LOD=${OPENVDB_BUILD_TOOLS}
         -DUSE_PKGCONFIG=OFF
-        ${OPENVDB_BUILD_AX}
+        -DOPENVDB_BUILD_AX=${OPENVDB_BUILD_AX}
+        -DUSE_EXPLICIT_INSTANTIATION=OFF
+    MAYBE_UNUSED_VARIABLES
+        OPENVDB_3_ABI_COMPATIBLE
 )
 
 vcpkg_cmake_install()

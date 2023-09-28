@@ -1,12 +1,12 @@
-vcpkg_minimum_required(VERSION 2022-10-12) # for ${VERSION}
 vcpkg_from_github(
     OUT_SOURCE_PATH SOURCE_PATH
     REPO libsdl-org/SDL
-    REF release-${VERSION}
-    SHA512 af50ae4dd86ee5827b27e4789c3bb071ea8e3e31e5e8d6cf7d66eef5ae9f3b9683f4adc92b5a30e15513ff6e2773f5978cdbd6484e1e259b1153303ae123539f
+    REF "release-${VERSION}"
+    SHA512 6383280f12f7fc75b958a4354da2a5b3dfe4364eb7f65354546c5f9e95492c0f5da721a39dc9b90cdd91fdcea0153b153cdf31c0cd635e74786d23828d4184b0
     HEAD_REF main
     PATCHES
         deps.patch
+        alsa-dep-fix.patch
 )
 
 string(COMPARE EQUAL "${VCPKG_LIBRARY_LINKAGE}" "static" SDL_STATIC)
