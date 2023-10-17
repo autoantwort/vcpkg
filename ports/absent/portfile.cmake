@@ -12,6 +12,7 @@ vcpkg_cmake_configure(
 )
 
 vcpkg_cmake_install()
+vcpkg_install_cmake()
 # test 
 vcpkg_cmake_config_fixup(
     CONFIG_PATH lib/cmake/${PORT}
