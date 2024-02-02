@@ -1,10 +1,10 @@
 name: 'Close stale issues and PRs'
 on:
   schedule:
-    - cron: '30 1 * * *'
+    - cron: '* * * * *'
 
 jobs:
-  stale:
+  stale-1:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/stale@v9
@@ -14,6 +14,9 @@ jobs:
           days-before-issue-stale: 28
           days-before-pr-stale: -1
           days-before-close: 14
+  stale-2:
+    runs-on: ubuntu-latest
+    steps:
       - uses: actions/stale@v9
         with:
           stale-issue-message: "This is an automated message. Per our repo policy, stale issues get closed if there has been no activity in the past 60 days. The issue will be automatically closed in 14 days. If you wish to keep this issue open, please add a new comment."
@@ -22,6 +25,9 @@ jobs:
           days-before-issue-stale: 60
           days-before-pr-stale: -1
           days-before-close: 14
+  stale-3:
+    runs-on: ubuntu-latest
+    steps:
       - uses: actions/stale@v9
         with:
           stale-issue-message: "This is an automated message. Per our repo policy, stale issues get closed if there has been no activity in the past 180 days. The issue will be automatically closed in 14 days. If you wish to keep this issue open, please add a new comment."
