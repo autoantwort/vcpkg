@@ -45,6 +45,8 @@ vcpkg_check_features(OUT_FEATURE_OPTIONS FEATURE_OPTIONS
         winidn      USE_WIN32_IDN
         websockets  ENABLE_WEBSOCKETS
         zstd        CURL_ZSTD
+        psl         CURL_USE_LIBPSL
+        gssapi      CURL_USE_GSSAPI
     INVERTED_FEATURES
         ldap        CURL_DISABLE_LDAP
         ldap        CURL_DISABLE_LDAPS
@@ -52,7 +54,7 @@ vcpkg_check_features(OUT_FEATURE_OPTIONS FEATURE_OPTIONS
 )
 
 set(OPTIONS "")
-if("idn2" IN_LIST FEATURES OR ("ldap" IN_LIST FEATURES AND NOT VCPKG_TARGET_IS_WINDOWS))
+if(("idn2" IN_LIST FEATURES) OR ("gssapi" IN_LIST FEATURES) OR ("ldap" IN_LIST FEATURES AND NOT VCPKG_TARGET_IS_WINDOWS))
     vcpkg_find_acquire_program(PKGCONFIG)
     list(APPEND OPTIONS "-DPKG_CONFIG_EXECUTABLE=${PKGCONFIG}")
 endif()
@@ -83,7 +85,6 @@ vcpkg_cmake_configure(
         -DBUILD_TESTING=OFF
         -DENABLE_CURL_MANUAL=OFF
         -DCURL_CA_FALLBACK=ON
-        -DCURL_USE_LIBPSL=OFF
         -DCMAKE_DISABLE_FIND_PACKAGE_Perl=ON
     OPTIONS_DEBUG
         -DENABLE_DEBUG=ON
