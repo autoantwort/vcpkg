@@ -16,11 +16,15 @@ jobs:
         with:
           script: |
             let issue_query = {
-              issue_number: 41821,
-              owner: "microsoft",
-              repo: "vcpkg"
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo
             };
-            let issue = await github.rest.issues.get(issue_query)
+            let issue1 = await github.rest.issues.get({...issue_query, issue_number: 41})
+            let issue2 = await github.rest.issues.get({...issue_query, issue_number: 42})
+            console.log(JSON.stringify(issue1))
+            console.log(JSON.stringify(issue2))
+            return;
             let commentLabelClose = async (comment, label) => {
               await github.rest.issues.removeAllLabels(issue_query);
               await github.rest.issues.setLabels({...issue_query, labels: [label]});
@@ -59,7 +63,7 @@ jobs:
             }
 
             // pkg-config/ not found issues like #36011
-            reg = /CMake Error at scripts\/cmake\/vcpkg_find_acquire_program.*\r?\n(.*Please install it via your package manager:[\s\S]+)Call Stack/;
+            reg = /CMake Error at scripts\/cmake\/vcpkg_find_acquire_program.*\r\n(.*Please install it via your package manager:[\s\S]+)Call Stack/;
             match = issue.data.body.match(reg)
             console.log("match", match, JSON.stringify(issue.data.body))
             if (match){
