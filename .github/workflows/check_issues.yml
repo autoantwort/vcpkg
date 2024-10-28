@@ -1,6 +1,7 @@
 name: Check For Common Issues
 
 on:
+  workflow_dispatch:
   issues:
     types:
       - opened
@@ -15,9 +16,9 @@ jobs:
         with:
           script: |
             let issue_query = {
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo
+              issue_number: 41821,
+              owner: "microsoft",
+              repo: "vcpkg"
             };
             let issue = await github.rest.issues.get(issue_query)
             let commentLabelClose = async (comment, label) => {
