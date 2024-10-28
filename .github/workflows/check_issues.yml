@@ -59,7 +59,7 @@ jobs:
             }
 
             // pkg-config/ not found issues like #36011
-            reg = /CMake Error at scripts\/cmake\/vcpkg_find_acquire_program.*\r\n(.*Please install it via your package manager:[\s\S]+)Call Stack/;
+            reg = /CMake Error at scripts\/cmake\/vcpkg_find_acquire_program.*\r?\n(.*Please install it via your package manager:[\s\S]+)Call Stack/;
             match = issue.data.body.match(reg)
             console.log("match", match, JSON.stringify(issue.data.body))
             if (match){
