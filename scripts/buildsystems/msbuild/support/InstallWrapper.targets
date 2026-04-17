@@ -1,0 +1,19 @@
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildThisFileDirectory)\GetGlobalProperties.task" />
+
+  <!-- The Install target invokes the InstallImplementation target.
+
+  MSBuild will ensure that MSBuild tasks with a given project path and set of global properties will run only once.
+  -->
+  <Target Name="VcpkgInstallWrapper">
+    <GetGlobalProperties>
+      <Output TaskParameter="GlobalPropertyNames" PropertyName="_ZVcpkgGlobalPropertyNames" />
+    </GetGlobalProperties>
+    <MSBuild BuildInParallel="true"
+             Projects="$(MSBuildThisFileDirectory)\InstallImplementation.targets"
+             Targets="VcpkgInstallImplementation"
+             RemoveProperties="$(_ZVcpkgGlobalPropertyNames)"
+             Properties="_ZVcpkgRoot=$(_ZVcpkgRoot);TLogLocation=$(TLogLocation);_ZVcpkgHostTripletSuffix=$(_ZVcpkgHostTripletSuffix);_ZVcpkgInstalledDir=$(_ZVcpkgInstalledDir);_ZVcpkgExecutable=$(_ZVcpkgExecutable);_ZVcpkgHostTripletParameter=$(_ZVcpkgHostTripletParameter);VcpkgTriplet=$(VcpkgTriplet);_ZVcpkgManifestRoot=$(_ZVcpkgManifestRoot);_ZVcpkgInstalledDir=$(_ZVcpkgInstalledDir);VcpkgAdditionalInstallOptions=$(VcpkgAdditionalInstallOptions);_ZVcpkgInstallManifestDependenciesInputs=$(_ZVcpkgInstallManifestDependenciesInputs);_ZVcpkgMSBuildStampFile=$(_ZVcpkgMSBuildStampFile)"
+             />
+  </Target>
+</Project>
