@@ -53,8 +53,14 @@ vcpkg_replace_string("${CURRENT_PACKAGES_DIR}/include/uwebsockets/WebSocketProto
 )
 configure_file("${CURRENT_PORT_DIR}/unofficial-uwebsockets-config.cmake" "${CURRENT_PACKAGES_DIR}/share/unofficial-uwebsockets/unofficial-uwebsockets-config.cmake" @ONLY)
 
+# LICENSE contains Apache-only notice but MoveOnlyFunction.h is MIT-licensed.
+file(READ "${SOURCE_PATH}/src/MoveOnlyFunction.h" move_only_function_h)
+string(REGEX MATCH "^/\\*([^*]|\\*+[^*/])*\\*+/" move_only_function_h_notice "${move_only_function_h}")
+if(NOT move_only_function_h_notice)
+    message(FATAL_ERROR "Failed to extract the license notice from MoveOnlyFunction.h")
+endif()
+file(WRITE "${CURRENT_BUILDTREES_DIR}/MoveOnlyFunction.h" "${move_only_function_h_notice}\n")
 vcpkg_install_copyright(FILE_LIST
     "${SOURCE_PATH}/LICENSE"
-    # LICENSE contains Apache-only notice but MoveOnlyFunction.h is MIT-licensed.
-    "${SOURCE_PATH}/src/MoveOnlyFunction.h"
+    "${CURRENT_BUILDTREES_DIR}/MoveOnlyFunction.h"
 )
