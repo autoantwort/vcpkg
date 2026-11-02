@@ -27,7 +27,13 @@ file(REMOVE_RECURSE "${CURRENT_PACKAGES_DIR}/debug/include")
 
 vcpkg_copy_pdbs()
 
+file(READ "${SOURCE_PATH}/src/efsw/String.hpp" string_hpp)
+string(REGEX MATCH "^/\\*([^*]|\\*+[^*/])*\\*+/" string_hpp_notice "${string_hpp}")
+if(NOT string_hpp_notice)
+    message(FATAL_ERROR "Failed to extract the license notice from String.hpp")
+endif()
+file(WRITE "${CURRENT_BUILDTREES_DIR}/String.hpp" "${string_hpp_notice}\n")
 vcpkg_install_copyright(FILE_LIST
     "${SOURCE_PATH}/LICENSE"
-    "${SOURCE_PATH}/src/efsw/String.hpp"
+    "${CURRENT_BUILDTREES_DIR}/String.hpp"
 )

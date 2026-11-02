@@ -2830,7 +2830,7 @@
     },
     "efsw": {
       "baseline": "1.7.2",
-      "port-version": 0
+      "port-version": 1
     },
     "egl": {
       "baseline": "2022-12-04",
