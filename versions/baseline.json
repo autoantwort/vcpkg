@@ -5998,7 +5998,7 @@
     },
     "libuv": {
       "baseline": "1.53.0",
-      "port-version": 0
+      "port-version": 1
     },
     "libuvc": {
       "baseline": "0.0.7",

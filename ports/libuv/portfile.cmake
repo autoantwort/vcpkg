@@ -46,11 +46,15 @@ endif()
 file(REMOVE_RECURSE "${CURRENT_PACKAGES_DIR}/debug/share" "${CURRENT_PACKAGES_DIR}/debug/include")
 
 file(INSTALL "${CMAKE_CURRENT_LIST_DIR}/usage" DESTINATION "${CURRENT_PACKAGES_DIR}/share/${PORT}")
-vcpkg_install_copyright(FILE_LIST
-    "${SOURCE_PATH}/LICENSE"
-    "${SOURCE_PATH}/LICENSE-extra"
-    "${SOURCE_PATH}/include/uv/tree.h"
-    "${SOURCE_PATH}/src/heap-inl.h"
-    "${SOURCE_PATH}/src/idna.h"
-    "${SOURCE_PATH}/src/inet.c"
-)
+set(copyright_files "${SOURCE_PATH}/LICENSE" "${SOURCE_PATH}/LICENSE-extra")
+foreach(file IN ITEMS include/uv/tree.h src/heap-inl.h src/idna.h src/inet.c)
+    file(READ "${SOURCE_PATH}/${file}" contents)
+    string(REGEX MATCH "^/\\*([^*]|\\*+[^*/])*\\*+/" notice "${contents}")
+    if(NOT notice)
+        message(FATAL_ERROR "Failed to extract the license notice from ${file}")
+    endif()
+    get_filename_component(file_name "${file}" NAME)
+    file(WRITE "${CURRENT_BUILDTREES_DIR}/${file_name}" "${notice}\n")
+    list(APPEND copyright_files "${CURRENT_BUILDTREES_DIR}/${file_name}")
+endforeach()
+vcpkg_install_copyright(FILE_LIST ${copyright_files})
