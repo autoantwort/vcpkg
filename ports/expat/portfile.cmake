@@ -40,8 +40,14 @@ if(VCPKG_LIBRARY_LINKAGE STREQUAL "static")
 endif()
 
 file(COPY "${CMAKE_CURRENT_LIST_DIR}/vcpkg-cmake-wrapper.cmake" DESTINATION "${CURRENT_PACKAGES_DIR}/share/${PORT}")
+file(READ "${SOURCE_PATH}/expat/lib/siphash.h" siphash_h)
+string(REGEX MATCH "^/\\*([^*]|\\*+[^*/])*\\*+/" siphash_h_notice "${siphash_h}")
+if(NOT siphash_h_notice)
+    message(FATAL_ERROR "Failed to extract the license notice from siphash.h")
+endif()
+file(WRITE "${CURRENT_BUILDTREES_DIR}/siphash.h" "${siphash_h_notice}\n")
 vcpkg_install_copyright(
     FILE_LIST
         "${SOURCE_PATH}/expat/COPYING"
-        "${SOURCE_PATH}/expat/lib/siphash.h"
+        "${CURRENT_BUILDTREES_DIR}/siphash.h"
 )
